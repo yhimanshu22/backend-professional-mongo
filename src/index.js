@@ -1,4 +1,5 @@
 //require('dotenv').config({path:'./env'});  //but this is bad practice---->
+
 import dotenv from 'dotenv';
 import connectDB from './db/index.js';
 
@@ -6,12 +7,21 @@ dotenv.config({
     path:'./env'
 })
 
-import express from 'express';
-const app =express();
 
 
+connectDB()
+.then(()=>{
+    app.listen(process.env.PORT||8000,()=>{
+        console.log(`server is running at port : ${process.env.PORT}`);
+    })
+   
+})
+.catch((error)=>{
+console.log('mongodb connection failed!!!',error);
+})
 
-//first approach----->
+
+//first approach for connecting database----->
 /*-------------->
 (async ()=>{
     try {
