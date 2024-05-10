@@ -1,21 +1,24 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-//making express app--------->
+import userRouter from './routes/user.routes.js'; // Import userRouter directly
 
-const app = express()
+// Making express app
+const app = express();
 
-//middlewares---------->
+// Middlewares
 app.use(cors({
-    origin:process.env.CORS_ORIGIN,
-    credentials:true
-}))
+    origin: process.env.CORS_ORIGIN,
+    credentials: true
+}));
 
-//taking data from form filled----->
-app.use(express.json({ limit:'16kb'}))
-//taking url form data--------->
-app.use(express.urlencoded({extended:true,limit:'16kb'}))
-app.use(express.static('public')) // if stored files in public folder
+app.use(express.json({ limit: '16kb' }));
+app.use(express.urlencoded({ extended: true, limit: '16kb' }));
+app.use(express.static('public'));
+app.use(cookieParser());
 
+// Routes declaration
+//app.use('/api/v1/users', userRouter);
 
-export {app} 
+// http://localhost:8000/api/v1/users/register
+export { app };
