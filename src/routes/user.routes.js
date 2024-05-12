@@ -25,4 +25,4 @@ router.route('/logout').post(verifyJWT,logoutUser)
 router.route('/refresh-token').post(refreshAccessToken)
 
 
-export  default router;//check this {router} is not all
+export  default router;//check this {router} is not allowed
