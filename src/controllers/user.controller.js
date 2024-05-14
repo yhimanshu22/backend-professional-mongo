@@ -175,6 +175,7 @@ const logoutUser = asyncHandler(async (req,res)=>{
      .json(new ApiResponse(200,{},"user logged out"))
 })
 
+
 const refreshAccessToken = asyncHandler(async (req,res)=>{
     const incomingRefreshToken = req.cookies.refreshToken||req.body.refreshToken
 
@@ -216,6 +217,7 @@ const refreshAccessToken = asyncHandler(async (req,res)=>{
     }
 })
 
+
 const changeCurrentPassword = asyncHandler(async (req,res)=>{
     
     const {oldPassword,newPassword} = req.body
@@ -234,9 +236,11 @@ const changeCurrentPassword = asyncHandler(async (req,res)=>{
     )
 })
 
+
 const getCurrentUser = asyncHandler(async(req,res)=>{
     return res.status(200).json(200,req.user,'current user fetched successfully')
 })
+
 
 const updateAccountDetails = asyncHandler(async(req,res)=>{
     const {fullName,email} = req.body
@@ -253,6 +257,7 @@ const updateAccountDetails = asyncHandler(async(req,res)=>{
     return res.status(200)
     .json(new ApiResponse(200,'Account details updated successfully'))
 })
+
 
 const updateUserAvatar = asyncHandler(async(req,res)=>{
     const avatarLocalPath = req.file?.path
@@ -310,6 +315,7 @@ const updateCoverImageAvatar = asyncHandler(async(req,res)=>{
 
 
 })
+
 
 const getUserChannelProfile = asyncHandler(async(req,res)=>{
     const {username} = req.params;
@@ -390,7 +396,56 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
 })
 
 
+const getWatchHistory = asyncHandler(async (req,res)=>{
+    const user = await User.aggregate([
+        {
+            $match:{
+                _id:new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup:{
+                from:"vidoes",
+                localField:"watchHistory",
+                foreignField:"_id",
+                as:"watchHistory",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from:"users",
+                            localField:"owner",
+                            foreignField:"_id",
+                            as:"owner",
+                            pipeline:[
+                                {
+                                    $project:{
+                                        fullName:1,
+                                        username:1,
+                                        avatar:1,
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        $addFields:{
+                            owner:{
+                                $first:"$owner"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200,user[0].getWatchHistory,"watch history fetched successfully")
+    )
+})
 
 
 
-export {registerUser,loginUser,logoutUser,changeCurrentPassword,refreshAccessToken,updateAccountDetails,getCurrentUser,updateCoverImageAvatar,updateUserAvatar,getUserChannelProfile,}
+export {registerUser,loginUser,logoutUser,changeCurrentPassword,refreshAccessToken,updateAccountDetails,getCurrentUser,updateCoverImageAvatar,updateUserAvatar,getUserChannelProfile,getWatchHistory,}
